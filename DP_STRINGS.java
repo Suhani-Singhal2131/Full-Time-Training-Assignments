@@ -260,7 +260,6 @@ public class DP_STRINGS {
     for (int j = 0; j <= m; j++) {
         dp[0][j] = j;
     }
-
     for(int i=1;i<=n;i++){
         for(int j=1;j<=m;j++){
             if(s1.charAt(i-1)==s2.charAt(j-1)){
@@ -272,18 +271,63 @@ public class DP_STRINGS {
     return dp[n][m];
  }
 
+ //WILDCARD MATCHING
+ public static boolean wildcard_matching_1(String s1,String s2,int n,int m ,int i,int j){
+    if(i<0 && j<0)return true;
+    if(i<0 && j>=0)return false;
+    if(i>=0 && j<0)return isallstars(s1,i);
+
+    if(s1.charAt(i)==s2.charAt(j)||s1.charAt(i)=='?'){
+        return wildcard_matching_1(s1, s2, n, m, i-1, j-1);
+    }
+    else{
+        if(s1.charAt(i)=='*'){
+            return wildcard_matching_1(s1, s2, n, m, i-1, j)||wildcard_matching_1(s1, s2, n, m, i, j-1);
+        }
+    }
+    return false;
+}
+ public static int wildcard_matching_2(String s1,String s2,int n,int m ,int i,int j,int[][]dp){
+    if(i<0 && j<0)return 1;
+    if(i<0 && j>=0)return 0;
+    if(i>=0 && j<0)return isallstars(s1,i)?1:0;
+    if(dp[i][j]!=-1)return dp[i][j];
+
+    if(s1.charAt(i)==s2.charAt(j)||s1.charAt(i)=='?'){
+        return dp[i][j]=wildcard_matching_2(s1, s2, n, m, i-1, j-1,dp);
+    }
+    else{
+        if(s1.charAt(i)=='*'){
+            if(wildcard_matching_2(s1, s2, n, m, i-1, j,dp)==1||wildcard_matching_2(s1, s2, n, m, i, j-1,dp)==1){
+                return dp[i][j]=1;
+            }
+            else{
+                return dp[i][j]=0;
+            }
+        }
+    }
+    return 0;
+}
+
+
+public static boolean isallstars(String s,int i){
+    for(int j=i;j>=0;j--){
+       if(s.charAt(j)!='*')return false;
+    }
+    return true;
+}
  public static void main(String[] args) {
-     String s1="horse";
+     String s1="*";
      int n=s1.length();
-     String s2="ros";
+     String s2="aa";
      int m=s2.length();
-     int[][]dp=new int[n+1][m+1];
+     int[][]dp=new int[n][m];
 
-    //  for(int[]row:dp){
-    //     Arrays.fill(row,-1);
-    //  }
+     for(int[]row:dp){
+        Arrays.fill(row,-1);
+     }
 
-     System.out.println(edit_distance_3(s1, s2, n, m,dp));
+     System.out.println(wildcard_matching_2(s1, s2, n, m,n-1,m-1,dp));
     //  for(int[]row:dp){
     //     for(int val: row){
     //         System.out.print(val+" ");
